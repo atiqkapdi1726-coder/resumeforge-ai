@@ -26,6 +26,9 @@ export function Header() {
 
         {/* Desktop Nav */}
         <nav className="hidden md:flex items-center space-x-6 ml-auto">
+          <Link href="/templates" className="text-sm font-medium hover:text-primary transition-colors">
+            Templates
+          </Link>
           <Link href="/pricing" className="text-sm font-medium hover:text-primary transition-colors">
             Pricing
           </Link>
@@ -106,6 +109,7 @@ export function Header() {
       {/* Mobile Menu */}
       {mobileMenuOpen && (
         <div className="md:hidden border-t bg-background p-4 space-y-3">
+          <Link href="/templates" className="block text-sm font-medium py-2" onClick={() => setMobileMenuOpen(false)}>Templates</Link>
           <Link href="/pricing" className="block text-sm font-medium py-2" onClick={() => setMobileMenuOpen(false)}>Pricing</Link>
           <Link href="/ats" className="block text-sm font-medium py-2" onClick={() => setMobileMenuOpen(false)}>ATS Checker</Link>
           {user ? (
