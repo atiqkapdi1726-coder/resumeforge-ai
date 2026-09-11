@@ -11,7 +11,7 @@ export async function POST(request: Request) {
     const token = authHeader.split('Bearer ')[1];
     const decoded = await getAdminAuth().verifyIdToken(token);
 
-    const { resumeId } = await request.json();
+    const { resumeId, templateId } = await request.json();
 
     if (!resumeId) {
       return NextResponse.json({ error: 'Resume ID required' }, { status: 400 });
@@ -27,24 +27,24 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    // Create duplicate with new ID
-    const { id: _id, ...resumeData } = { id: doc.id, ...data };
-    const duplicateData = {
-      ...resumeData,
-      title: `${data.title} (Copy)`,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      atsScore: null,
-      shareId: null,
-    };
+    // Increment PDF download count
+    const usageRef = getAdminDb().collection('usage').doc(decoded.uid);
+    const usageDoc = await usageRef.get();
+    if (usageDoc.exists) {
+      const usage = usageDoc.data()!;
+      await usageRef.update({
+        pdfDownloads: (usage.pdfDownloads || 0) + 1,
+        lastUpdated: new Date().toISOString(),
+      });
+    }
 
-    const newDocRef = await getAdminDb().collection('resumes').add(duplicateData);
-
+    // Return the resume data for client-side PDF generation
     return NextResponse.json({
-      resume: { id: newDocRef.id, ...duplicateData },
+      resume: { id: doc.id, ...data },
+      templateId: templateId || data.templateId || 'classic',
     });
   } catch (error) {
-    console.error('Duplicate error:', error);
-    return NextResponse.json({ error: 'Failed to duplicate resume' }, { status: 500 });
+    console.error('PDF export error:', error);
+    return NextResponse.json({ error: 'Export failed' }, { status: 500 });
   }
 }

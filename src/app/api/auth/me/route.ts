@@ -1,26 +1,28 @@
 import { NextResponse } from 'next/server';
+import { getAdminAuth } from '@/lib/firebase-admin';
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    const user = {
-      id: 'user_123',
-      email: 'demo@example.com',
-      displayName: 'Demo User',
-      subscription: {
-        plan: 'free',
-        status: 'active',
-      },
-      usage: {
-        resumesCreated: 0,
-        atsChecks: 0,
-        aiImprovements: 0,
-        pdfDownloads: 0,
-        lastUpdated: new Date().toISOString(),
-      },
-    };
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return NextResponse.json({ error: 'No token provided' }, { status: 401 });
+    }
 
-    return NextResponse.json({ user });
+    const token = authHeader.split('Bearer ')[1];
+    const decodedToken = await getAdminAuth().verifyIdToken(token);
+
+    const user = await getAdminAuth().getUser(decodedToken.uid);
+
+    return NextResponse.json({
+      user: {
+        id: user.uid,
+        email: user.email,
+        displayName: user.displayName || user.email?.split('@')[0] || 'User',
+        photoURL: user.photoURL,
+      },
+    });
   } catch (error) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    console.error('Auth verification failed:', error);
+    return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
   }
 }

@@ -8,12 +8,22 @@ const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'ResumeForge AI - Build a resume that gets noticed',
-  description: 'Create an ATS-friendly resume, tailor it to every job, and improve your application with AI-powered recommendations.',
-  keywords: ['resume builder', 'ATS friendly', 'AI resume', 'resume maker', 'job application'],
+  description: 'Create an ATS-friendly resume with AI. Get scored against job descriptions, tailored for applications, and download professional PDFs.',
+  keywords: ['resume builder', 'ATS friendly', 'AI resume', 'resume maker', 'job application', 'CV builder', 'resume optimizer'],
   openGraph: {
     title: 'ResumeForge AI - Build a resume that gets noticed',
-    description: 'Create an ATS-friendly resume, tailor it to every job, and improve your application with AI-powered recommendations.',
+    description: 'Create an ATS-friendly resume with AI. Get scored against job descriptions, tailored for applications, and download professional PDFs.',
     type: 'website',
+    siteName: 'ResumeForge AI',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'ResumeForge AI - Build a resume that gets noticed',
+    description: 'Create an ATS-friendly resume with AI. Get scored against job descriptions, tailored for applications, and download professional PDFs.',
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 };
 

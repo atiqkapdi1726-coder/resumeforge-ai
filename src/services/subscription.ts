@@ -1,5 +1,25 @@
-import { PricingPlan, PlanLimits } from '@/types';
+'use client';
+
 import { PRICING_PLANS } from '@/config';
+
+export interface PricingPlan {
+  id: string;
+  name: string;
+  price: number;
+  interval: 'month' | 'year';
+  features: string[];
+  limits: {
+    maxResumes: number;
+    maxAtsChecks: number;
+    maxAiImprovements: number;
+    maxPdfDownloads: number;
+    premiumTemplates: boolean;
+    advancedAnalysis: boolean;
+    coverLetters: boolean;
+    jobMatching: boolean;
+  };
+  isPopular?: boolean;
+}
 
 export function getPlans(): PricingPlan[] {
   return PRICING_PLANS as unknown as PricingPlan[];
@@ -9,32 +29,9 @@ export function getPlanById(id: string): PricingPlan | undefined {
   return (PRICING_PLANS as unknown as PricingPlan[]).find((p) => p.id === id);
 }
 
-export function checkUsageLimit(
-  plan: string,
-  resource: keyof PlanLimits,
-  currentUsage: number
-): boolean {
-  const planConfig = getPlanById(plan);
-  if (!planConfig) return false;
-
-  const limit = planConfig.limits[resource];
-  if (typeof limit === 'boolean') return limit;
-  if (limit === -1) return true;
-  return currentUsage < limit;
-}
-
-export function getUsageLimit(plan: string, resource: keyof PlanLimits): number {
-  const planConfig = getPlanById(plan);
-  if (!planConfig) return 0;
-
-  const limit = planConfig.limits[resource];
-  if (typeof limit === 'boolean') return limit ? Infinity : 0;
-  return limit === -1 ? Infinity : limit;
-}
-
 export function canPerformAction(
   plan: string,
-  resource: keyof PlanLimits,
+  resource: string,
   currentUsage: number
 ): { allowed: boolean; remaining: number; limit: number } {
   const planConfig = getPlanById(plan);
@@ -42,7 +39,8 @@ export function canPerformAction(
     return { allowed: false, remaining: 0, limit: 0 };
   }
 
-  const limit = planConfig.limits[resource];
+  const limits = planConfig.limits as Record<string, number | boolean>;
+  const limit = limits[resource];
 
   if (typeof limit === 'boolean') {
     return { allowed: limit, remaining: limit ? Infinity : 0, limit: limit ? Infinity : 0 };
@@ -52,10 +50,10 @@ export function canPerformAction(
     return { allowed: true, remaining: Infinity, limit: Infinity };
   }
 
-  const remaining = Math.max(0, limit - currentUsage);
+  const remaining = Math.max(0, (limit as number) - currentUsage);
   return {
-    allowed: currentUsage < limit,
+    allowed: currentUsage < (limit as number),
     remaining,
-    limit,
+    limit: limit as number,
   };
 }

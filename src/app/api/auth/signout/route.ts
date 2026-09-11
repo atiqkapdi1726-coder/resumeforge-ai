@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+// firebase-admin imports removed — not used in this route
 
 export async function POST() {
   try {
@@ -8,6 +9,7 @@ export async function POST() {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       maxAge: 0,
+      path: '/',
     });
 
     return response;

@@ -1,7 +1,9 @@
+'use client';
+
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Check } from 'lucide-react';
+import { Check, ArrowRight } from 'lucide-react';
 import { PRICING_PLANS } from '@/config';
 import { formatCurrency } from '@/lib/utils';
 
@@ -48,8 +50,8 @@ export default function PricingPage() {
               <CardContent>
                 <ul className="space-y-3">
                   {p.features.map((feature) => (
-                    <li key={feature} className="flex items-center">
-                      <Check className="h-4 w-4 text-primary mr-2 shrink-0" />
+                    <li key={feature} className="flex items-start">
+                      <Check className="h-4 w-4 text-primary mr-2 mt-0.5 shrink-0" />
                       <span className="text-sm">{feature}</span>
                     </li>
                   ))}
@@ -60,7 +62,8 @@ export default function PricingPage() {
                       className="w-full"
                       variant={p.isPopular ? 'default' : 'outline'}
                     >
-                      {p.id === 'free' ? 'Get Started' : 'Upgrade to Pro'}
+                      {p.id === 'free' ? 'Get Started Free' : 'Get Started'}
+                      <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                   </Link>
                 </div>
@@ -72,7 +75,7 @@ export default function PricingPage() {
 
       <div className="mt-16 text-center">
         <p className="text-muted-foreground">
-          All plans include a 7-day free trial. No credit card required.
+          All paid plans include a 7-day free trial. No credit card required.
         </p>
       </div>
 
@@ -96,6 +99,10 @@ export default function PricingPage() {
             {
               question: 'Can I switch between plans?',
               answer: 'Yes, you can upgrade or downgrade your plan at any time. Changes take effect immediately with prorated billing.',
+            },
+            {
+              question: 'Is my data secure?',
+              answer: 'Yes, we use industry-standard encryption and Firebase security rules. Your data is always private and only accessible by you.',
             },
           ].map((faq) => (
             <div key={faq.question} className="border rounded-lg p-6">
